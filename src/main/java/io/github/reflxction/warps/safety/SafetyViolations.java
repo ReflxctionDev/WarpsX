@@ -36,7 +36,7 @@ public enum SafetyViolations {
     /**
      * The warp contains lava
      */
-    LAVA("Lava"),
+    LAVA("Lava/Fire"),
 
     /**
      * The warp contains TNT
@@ -96,7 +96,7 @@ public enum SafetyViolations {
         if (materials.contains(Material.TNT))
             safety.add(TNT);
 
-        if (materials.contains(Material.LAVA) || materials.contains(Material.matchMaterial("STATIONARY_LAVA")))
+        if (materials.contains(Material.FIRE) || materials.contains(Material.LAVA) || materials.contains(Material.matchMaterial("STATIONARY_LAVA")))
             safety.add(LAVA); // Lava
 
         if (!loc.subtract(0, 1, 0).getBlock().getType().isSolid())
