@@ -80,7 +80,7 @@ public class EnchantmentsAdapter implements JsonSerializer<Map<Enchantment, Inte
     @Override
     public JsonElement serialize(Map<Enchantment, Integer> src, Type typeOfSrc, JsonSerializationContext context) {
         JsonArray array = new JsonArray();
-        src.forEach((ench, power) -> array.add(Compatibility.either(() -> ench.getKey().getKey(), ench::getName) + ":" + power));
+        src.forEach((ench, power) -> array.add(new JsonPrimitive(Compatibility.either(() -> ench.getKey().getKey(), ench::getName) + ":" + power)));
         return array;
     }
 }
