@@ -1,0 +1,41 @@
+{
+  "globalPrefix": "&7[&aWarps&2X&7] ",
+  "success": {
+    "warpCreated": "&aWarp &e{warp_key} &ahas been successfully created.",
+    "warpPublic": "&aWarp &e{warp_key} &ais now &dpublic&a.",
+    "warpPrivate": "&aWarp &e{warp_key} &ais now &dprivate&a.",
+    "invitedPlayer": "&aSuccessfully invited player &e{player} &ato warp &e{warp_key}",
+    "uninvitedPlayer": "&aSuccessfully uninvited player &e{player} &afrom warp &e{warp_key}",
+    "uninvitedAll": "&aSuccessfully uninvited all players from warp &e{warp_key}",
+    "warpSafe": "&aThis warp is safe.",
+    "warpDeleted": "&aWarp &e{warp_key} &ahas been deleted.",
+    "greetingMessageUpdated": "&aGreeting message for warp &e{warp_key} &ahas been set to &e{warp_greeting}",
+    "locationUpdated": "&aLocation of warp &e{warp_key} &ahas been updated to: &dX: &e{x}&d, Y: &e{y}&d, Z: &e{z}&a.",
+    "publicNote": "&eNote: &dYour warp is public",
+    "soundAdded": "&aSound of warp &e{warp_key} &ahas been set to &e{sound}&a.",
+    "soundRemoved": "&aSound of warp &e{warp_key} &ahas been removed.",
+    "delaySet": "&aDelay of warp &e{warp_key} &ahas been set to &e{warp_delay}&a second{warp_delay_plural}.",
+    "playerBanned": "&aPlayer &e{player} &acan no longer use warp &e{warp_key}&a.",
+    "playerUnbanned": "&aPlayer &e{player} &acan now use warp &e{warp_key}&a.",
+    "unbannedAll": "&aSuccessfully unbanned all players from using warp &e{warp_key}&a."
+  },
+  "error": {
+    "noPermission": "&cYou do not have permission to use this command.",
+    "playerNotInvited": "&cPlayer &e{player} &cis not invited.",
+    "ownerBanned": "&cYou are banned from creating warps!",
+    "userBanned": "&cYou are banned from using warps!",
+    "mustWait": "&cYou must wait &e{player_delay} second{player_delay_plural} &cbefore using this warp again",
+    "warpLimit": "&cYou have reached the maximum warp limit!",
+    "noWarps": "&cYou do not have any warps!",
+    "warpBanned": "&cThis warp is banned.",
+    "playerAlreadyBanned": "&cPlayer &e{player} &cis already banned.",
+    "playerNotBanned": "&cPlayer &e{player} &cis not banned.",
+    "bannedFromWarp": "&cYou are banned from using this warp!",
+    "warpNotSafe": "&cThis warp violates one or more safety measures. Confirm with &e/warp {warp_key} &oconfirm&c.",
+    "cannotInviteSelf": "&cYou cannot invite yourself!",
+    "cannotUninviteSelf": "&cYou cannot uninvite yourself!",
+    "notWarpOwner": "&cYou must be the warp owner!",
+    "notInvited": "&cYou are not invited to this warp.",
+    "warpAlreadyExists": "&cA warp with key &e{warp_key} &calreday exists!"
+  }
+}

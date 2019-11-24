@@ -1,0 +1,64 @@
+{
+  "allWarpsMenu": {
+    "title": "&5{player}'s warps",
+    "warpItem": {
+      "type": "nether_star",
+      "count": 1,
+      "enchantments": [
+        "LURE:1"
+      ],
+      "displayName": "&a{warp_key}",
+      "lore": [
+        "&e",
+        "&eClick to open settings"
+      ],
+      "itemFlags": [
+        "HIDE_ENCHANTS"
+      ]
+    }
+  },
+  "warpsMenu": {
+    "rows": 3,
+    "title": "&4{warp_key}",
+    "items": {
+      "goToWarp": {
+        "slot": 10,
+        "item": {
+          "type": "stained_clay",
+          "count": 1,
+          "enchantments": [],
+          "displayName": "&bTeleport to warp",
+          "lore": [],
+          "itemFlags": [],
+          "color": "blue"
+        }
+      },
+      "deleteWarp": {
+        "slot": 13,
+        "item": {
+          "type": "stained_clay",
+          "count": 1,
+          "enchantments": [],
+          "displayName": "&cDelete warp",
+          "lore": [],
+          "itemFlags": [],
+          "color": "red"
+        }
+      },
+      "changeLocation": {
+        "slot": 16,
+        "item": {
+          "type": "stained_clay",
+          "count": 1,
+          "enchantments": [],
+          "displayName": "&aSet location",
+          "lore": [
+            "&eSet the warp location to your current location"
+          ],
+          "itemFlags": [],
+          "color": "lime"
+        }
+      }
+    }
+  }
+}

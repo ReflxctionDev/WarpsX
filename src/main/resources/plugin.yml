@@ -1,0 +1,6 @@
+name: WarpsX
+version: ${project.version}
+main: io.github.reflxction.warps.WarpsX
+authors: [Reflxction]
+api-version: "1.13"
+description: A powerful user-warps plugin

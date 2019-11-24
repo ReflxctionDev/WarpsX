@@ -1,0 +1,57 @@
+# General warp settings
+Warps:
+
+  # The default greeting message.
+  #
+  # Set to "{}" to cancel
+  DefaultGreetingMessage: "&eWelcome to warp &d{warp}&e!"
+
+  # The default delay for each warp
+  #
+  # Default value: 10
+  DefaultDelay: 10
+
+# Storage settings
+Storage:
+
+  # Represents how players are stored in files.
+  #
+  # Values (case-insensitive):
+  # 1- UUID (default) - Store each player by their UUID (recommended)
+  # 2- Name - Store each player by their name
+  PlayerStoringStrategy: "UUID"
+
+# Settings for warp safety
+WarpSafety:
+
+  # The cuboid length in which the checks are made. The center of the cuboid
+  # is the warp location, and it will extend from this center.
+  #
+  # It is recommended to have the value as an odd number (1, 3, 5, etc.), as
+  # even numbers will not be able to extend from a center location, and will get converted to
+  # an odd numbers by subtracting 1.
+  #
+  # Default value: 5
+  SafetyCuboidLength: 5
+
+  # Whether should it warn before the player uses a warp
+  WarnBeforeWarping: true
+
+  # Checks to check for before using the warp.
+  #
+  # Note: These values are constant! Adding your own values will not work.
+  #
+  # Comment out any checks you do not want to be made.
+  #
+  # LAVA: There is lava in the warp
+  # TNT: There is TNT in the warp
+  # SUFFOCATION: The player will get suffocation damage when using the warp
+  # NO_BLOCKS: The warp has no solid blocks (entirely air/water/lava/etc.)
+  # NO_PLATFORM: The warp location is not a solid block (could be air, water, etc.)
+  # ===============================================================================
+  Checks:
+    - LAVA
+    - TNT
+    - SUFFOCATION
+    - NO_BLOCKS
+    - NO_PLATFORM
