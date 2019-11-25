@@ -165,7 +165,7 @@ public class AdminWarpsCommand extends BaseCommand {
     @CommandCompletion("@players")
     public static void banUser(CommandSender sender, OfflinePlayer player) {
         PluginData.BANNED_USERS.get().add(player.getUniqueId());
-        Chat.admin(sender, "&aPlayer &e" + player.getName() + " &acan no &clonger &ause any warps.");
+        Chat.admin(sender, "&aPlayer &e" + player.getName() + " &acan no longer &cuse &aany warps.");
     }
 
     @Subcommand("unban")

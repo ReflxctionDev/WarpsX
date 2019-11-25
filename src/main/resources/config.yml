@@ -43,7 +43,7 @@ WarpSafety:
   #
   # Comment out any checks you do not want to be made.
   #
-  # LAVA: There is lava in the warp
+  # LAVA: There is lava or fire in the warp
   # TNT: There is TNT in the warp
   # SUFFOCATION: The player will get suffocation damage when using the warp
   # NO_BLOCKS: The warp has no solid blocks (entirely air/water/lava/etc.)
