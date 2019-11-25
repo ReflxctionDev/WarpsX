@@ -94,7 +94,7 @@ public class AdminWarpsCommand extends BaseCommand {
     @Subcommand("removecue|removesound")
     @Syntax("&e<warp key>")
     @Description("Set the cue sound of the warp")
-    @CommandPermission("%admin.removesound")
+    @CommandPermission("%admin.cue")
     @CommandCompletion("@playerwarps")
     public static void removeSound(CommandSender sender, PlayerWarp warp) {
         warp.setSound(null);
