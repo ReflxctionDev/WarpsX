@@ -18,18 +18,27 @@ package io.github.reflxction.warps.command;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import io.github.reflxction.warps.gui.WarpGUI;
+import io.github.reflxction.warps.messages.Chat;
 import io.github.reflxction.warps.util.compatibility.Commands;
 import io.github.reflxction.warps.warp.PlayerWarp;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 
 @CommandAlias("warpgui|warpsgui|wgui")
 public class WarpsGUICommand extends BaseCommand {
+
+    private static final Permission GUI = new Permission("warpsx.gui", PermissionDefault.TRUE);
 
     @Default
     @Syntax("&a[warp key]")
     @Conditions("player") @CommandCompletion("@playerwarps") @Description("Teleport to a warp")
     public static void display(CommandSender sender, @Optional PlayerWarp warp) {
+        if (!Commands.permission(sender, GUI)) {
+            Chat.permission(sender);
+            return;
+        }
         Player player = Commands.safe(sender);
         if (warp == null) {
             WarpGUI.displayAllWarps(player);
