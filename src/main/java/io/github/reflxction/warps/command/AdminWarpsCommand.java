@@ -179,7 +179,7 @@ public class AdminWarpsCommand extends BaseCommand {
     }
 
     @Subcommand("unbanall")
-    @CommandPermission("%admin.unban.warp.all")
+    @CommandPermission("%admin.unban.user.all")
     @Syntax("")
     @Description("Unban all players banned from using warps")
     @CommandCompletion("@players")
