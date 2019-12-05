@@ -74,6 +74,7 @@ public class WarpGUI implements Listener {
         }
         if (player.hasMetadata("warpsx.warpgui")) {
             event.setCancelled(true);
+            Menu warpsMenu = WarpsX.getWarpGUI().warpsMenu;
             GuiItem warpTo = warpsMenu.getItems().get("goToWarp");
             GuiItem deleteWarp = warpsMenu.getItems().get("deleteWarp");
             GuiItem changeLoc = warpsMenu.getItems().get("changeLocation");

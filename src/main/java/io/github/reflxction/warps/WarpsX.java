@@ -117,7 +117,7 @@ public final class WarpsX extends JavaPlugin {
         initCommandManager(commandManager);
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
         getServer().getPluginManager().registerEvents(new CommandListener(), this);
-        getServer().getPluginManager().registerEvents(new WarpGUI(), this);
+        getServer().getPluginManager().registerEvents(warpGUI, this);
         getServer().getPluginManager().registerEvents(new WarpInvincibility(this), this);
         getServer().getPluginManager().registerEvents(WarpsXCommand.INSTANCE, this);
         ExclusionManager.start(this);
