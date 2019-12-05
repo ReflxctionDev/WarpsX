@@ -1,4 +1,5 @@
 {
+  "warpCreationCost": 0,
   "adminOnly": false,
   "warpsLimit": 15,
   "bannedPlayers": [],
