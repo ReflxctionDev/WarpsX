@@ -20,7 +20,6 @@ import co.aikar.commands.CommandHelp;
 import co.aikar.commands.HelpEntry;
 import co.aikar.commands.annotation.*;
 import io.github.reflxction.warps.WarpsX;
-import io.github.reflxction.warps.json.PluginData;
 import io.github.reflxction.warps.messages.Chat;
 import io.github.reflxction.warps.messages.MessageKey;
 import io.github.reflxction.warps.util.chat.ChatComponent;
@@ -29,12 +28,12 @@ import io.github.reflxction.warps.util.chat.ChatEvents.HoverEvent;
 import io.github.reflxction.warps.util.chat.ComponentJSON;
 import io.github.reflxction.warps.util.chat.PageFooter;
 import io.github.reflxction.warps.util.compatibility.Commands;
-import io.github.reflxction.warps.util.game.DelayManager;
 import io.github.reflxction.warps.util.game.ListPaginator;
 import io.github.reflxction.warps.util.game.ListPaginator.Footer;
 import io.github.reflxction.warps.util.game.ListPaginator.Header;
 import io.github.reflxction.warps.util.game.ListPaginator.MessageConverter;
 import io.github.reflxction.warps.util.game.ListPaginator.MessagePlatform;
+import io.github.reflxction.warps.util.game.delay.ExclusionManager;
 import io.github.reflxction.warps.warp.PlayerWarp;
 import io.github.reflxction.warps.warp.WarpController;
 import org.bukkit.Location;
@@ -64,6 +63,7 @@ public class WarpsCommand extends BaseCommand {
     private static final Permission UNINVITE_ALL = createDefaultPermission("warpsx.uninviteall");
     private static final Permission LIST_WARPS = createDefaultPermission("warpsx.listwarps");
     private static final Permission LIST_INVITED = createDefaultPermission("warpsx.listinvited");
+    private static final Permission COMPASS = createDefaultPermission("warpsx.compass");
     private static final Permission SET_DELAY = createDefaultPermission("warpsx.delay");
     private static final Permission WARP_INFO = createDefaultPermission("warpsx.info");
     private static final Permission BAN_PLAYER = createDefaultPermission("warpsx.ban");
@@ -130,24 +130,24 @@ public class WarpsCommand extends BaseCommand {
 
     @CommandAlias("setwarp|createwarp|addwarp")
     @Syntax("&e<warp key>") @Description("Create a warp point")
-    @Conditions("player") @Subcommand("create")
+    @Conditions("player|claim") @Subcommand("create")
     public void createWarp(CommandSender e, String key) {
         Player player = Commands.safe(e);
         if (!Commands.permission(e, CREATE_WARP)) {
             Chat.permission(e);
             return;
         }
-        if (PluginData.BANNED_WARP_OWNERS.get().contains(player.getUniqueId())) {
+        if (WarpsX.getPluginData().getBannedWarpOwners().contains(player.getUniqueId())) {
             MessageKey.CREATE_BANNED.send(player, null, null, player);
             return;
         }
-        if (PluginData.ADMIN_ONLY.get()) {
+        if (WarpsX.getPluginData().isAdminOnly()) {
             if (!player.hasPermission("warpsx.admin.create")) {
                 Chat.permission(e);
                 return;
             }
         }
-        if (!player.hasPermission("warpsx.bypass.creationlimit") && WarpController.getWarps(player).size() >= PluginData.WARPS_LIMIT.get()) {
+        if (!player.hasPermission("warpsx.bypass.creationlimit") && WarpController.getWarps(player).size() >= WarpsX.getPluginData().getWarpsLimit()) {
             MessageKey.WARP_LIMIT.send(player, null, null, player);
             return;
         }
@@ -332,6 +332,25 @@ public class WarpsCommand extends BaseCommand {
         warp.getInvited().forEach(inv -> Chat.unprefixed(sender, "&7- &e" + inv.getName()));
     }
 
+    @Subcommand("compass")
+    @Syntax("&e<warp key>")
+    @Description("Point your compass to the specified warp")
+    @Conditions("player")
+    @CommandCompletion("@playerwarps")
+    public static void pointCompass(CommandSender sender, PlayerWarp warp) {
+        if (!Commands.permission(sender, COMPASS)) {
+            Chat.permission(sender);
+            return;
+        }
+        if (!warp.canModify(sender)) {
+            MessageKey.NOT_WARP_OWNER.send(sender, warp.getLocation(), warp, null);
+            return;
+        }
+        Player player = Commands.safe(sender);
+        player.setCompassTarget(warp.getLocation());
+        Chat.admin(sender, "&aYour compass now points to warp &e" + warp.getKey() + "&a.");
+    }
+
     @Subcommand("delay")
     @Syntax("&e<warp key> <delay>")
     @Description("Set the delay of a warp")
@@ -350,7 +369,7 @@ public class WarpsCommand extends BaseCommand {
     @Syntax("&e<warp key>")
     @Description("Get all information about a specific warp")
     @CommandCompletion("@playerwarps")
-    public static void getWarpInfo(CommandSender sender, PlayerWarp warp) {
+    public void getWarpInfo(CommandSender sender, PlayerWarp warp) {
         if (!Commands.permission(sender, WARP_INFO)) {
             Chat.permission(sender);
             return;
@@ -377,7 +396,7 @@ public class WarpsCommand extends BaseCommand {
     @Syntax("&e<warp key> <player to ban>")
     @Description("Ban a player from using this warp")
     @CommandCompletion("@playerwarps @players")
-    public static void banPlayer(CommandSender sender, PlayerWarp warp, OfflinePlayer banned) {
+    public void banPlayer(CommandSender sender, PlayerWarp warp, OfflinePlayer banned) {
         if (!Commands.permission(sender, BAN_PLAYER)) {
             Chat.permission(sender);
             return;
@@ -398,7 +417,7 @@ public class WarpsCommand extends BaseCommand {
     @Syntax("&e<warp key> <player to unban>")
     @Description("Unbans a player and allows them to use the warp again")
     @CommandCompletion("@playerwarps @players")
-    public static void unbanPlayer(CommandSender sender, PlayerWarp warp, OfflinePlayer unban) {
+    public void unbanPlayer(CommandSender sender, PlayerWarp warp, OfflinePlayer unban) {
         if (!Commands.permission(sender, UNBAN_PLAYER)) {
             Chat.permission(sender);
             return;
@@ -420,7 +439,7 @@ public class WarpsCommand extends BaseCommand {
     @Syntax("&e<warp key>")
     @Description("List all banned players in a specific warp")
     @CommandCompletion("@playerwarps")
-    public static void listBans(CommandSender sender, PlayerWarp warp) {
+    public void listBans(CommandSender sender, PlayerWarp warp) {
         if (!Commands.permission(sender, LIST_BANS)) {
             Chat.permission(sender);
             return;
@@ -437,7 +456,7 @@ public class WarpsCommand extends BaseCommand {
     @Syntax("&e<warp key>")
     @Description("Unban all banned players from a specific warp")
     @CommandCompletion("@playerwarps")
-    public static void unbanAll(CommandSender sender, PlayerWarp warp) {
+    public void unbanAll(CommandSender sender, PlayerWarp warp) {
         if (!Commands.permission(sender, UNBAN_ALL)) {
             Chat.permission(sender);
             return;
@@ -454,21 +473,21 @@ public class WarpsCommand extends BaseCommand {
     @Syntax("&e<warp key> <open duration>")
     @Description("Sets the warp open duration")
     @CommandCompletion("@playerwarps @range:1-10")
-    public static void setExclusion(CommandSender sender, PlayerWarp warp, int duration) {
+    public void setExclusion(CommandSender sender, PlayerWarp warp, int duration) {
         if (!Commands.permission(sender, EXLUCSION)) {
             Chat.permission(sender);
             return;
         }
         warp.setExclusion(duration);
-        DelayManager.startExclusion(warp);
+        ExclusionManager.startExclusion(warp);
         Chat.admin(sender, "&aWarp &e" + warp.getKey() + " &awill be public for &e" + duration + " &asecond" + (duration == 1 ? "" : "s") + ".");
     }
 
     @Private
     @Description("Get the plugin version")
     @Subcommand("v|version")
-    public static void getVersion(CommandSender sender) {
-        Chat.admin(sender, "&aWarpsX v&d" + WarpsX.getPlugin().getDescription().getVersion());
+    public void getVersion(CommandSender sender) {
+        Chat.admin(sender, "&aWarpsX v&d" + plugin.getDescription().getVersion());
     }
 
     private static Permission createDefaultPermission(String permission) {

@@ -18,7 +18,7 @@ package io.github.reflxction.warps.util.chat;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.github.moltenjson.utils.JsonBuilder;
+import net.moltenjson.utils.JsonBuilder;
 import io.github.reflxction.warps.messages.Chat;
 import io.github.reflxction.warps.util.chat.ChatEvents.ClickAction;
 import io.github.reflxction.warps.util.chat.ChatEvents.ClickEvent;

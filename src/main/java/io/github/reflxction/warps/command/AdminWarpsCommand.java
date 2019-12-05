@@ -19,7 +19,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.HelpEntry;
 import co.aikar.commands.annotation.*;
-import io.github.reflxction.warps.json.PluginData;
+import io.github.reflxction.warps.WarpsX;
 import io.github.reflxction.warps.messages.Chat;
 import io.github.reflxction.warps.util.chat.ChatComponent;
 import io.github.reflxction.warps.util.chat.ChatEvents.ClickEvent;
@@ -38,6 +38,8 @@ import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.Set;
 
 @CommandAlias("awarps|warpsadmin")
 public class AdminWarpsCommand extends BaseCommand {
@@ -164,7 +166,7 @@ public class AdminWarpsCommand extends BaseCommand {
     @Description("Ban a player from using warps")
     @CommandCompletion("@players")
     public static void banUser(CommandSender sender, OfflinePlayer player) {
-        PluginData.BANNED_USERS.get().add(player.getUniqueId());
+        WarpsX.getPluginData().getBannedUsers().add(player.getUniqueId());
         Chat.admin(sender, "&aPlayer &e" + player.getName() + " &acan no longer &cuse &aany warps.");
     }
 
@@ -174,7 +176,7 @@ public class AdminWarpsCommand extends BaseCommand {
     @Description("Unban a player from using warps")
     @CommandCompletion("@players")
     public static void unbanUser(CommandSender sender, OfflinePlayer player) {
-        PluginData.BANNED_USERS.get().remove(player.getUniqueId());
+        WarpsX.getPluginData().getBannedUsers().remove(player.getUniqueId());
         Chat.admin(sender, "&aPlayer &e" + player.getName() + " &acan now use warps again.");
     }
 
@@ -184,7 +186,7 @@ public class AdminWarpsCommand extends BaseCommand {
     @Description("Unban all players banned from using warps")
     @CommandCompletion("@players")
     public static void unbanAll(CommandSender sender) {
-        PluginData.BANNED_USERS.get().clear();
+        WarpsX.getPluginData().getBannedUsers().clear();
         Chat.admin(sender, "&aSuccessfully unbanned all players banned from using warps.");
     }
 
@@ -214,7 +216,7 @@ public class AdminWarpsCommand extends BaseCommand {
     @Description("Ban a player from creating any warps")
     @CommandCompletion("@players")
     public static void banWarpOwner(CommandSender sender, OfflinePlayer player) {
-        PluginData.BANNED_WARP_OWNERS.get().add(player.getUniqueId());
+        WarpsX.getPluginData().getBannedWarpOwners().add(player.getUniqueId());
         Chat.admin(sender, "&aPlayer &e" + player.getName() + " &acan no longer &ccreate &aany warps.");
     }
 
@@ -224,7 +226,7 @@ public class AdminWarpsCommand extends BaseCommand {
     @Description("Unban a player from creating any warps")
     @CommandCompletion("@players")
     public static void unbanWarpOwner(CommandSender sender, OfflinePlayer player) {
-        PluginData.BANNED_WARP_OWNERS.get().remove(player.getUniqueId());
+        WarpsX.getPluginData().getBannedWarpOwners().remove(player.getUniqueId());
         Chat.admin(sender, "&aPlayer &e" + player.getName() + " &acan now create warps.");
     }
 
@@ -234,7 +236,7 @@ public class AdminWarpsCommand extends BaseCommand {
     @Description("Unban all player banned from creating warps")
     @CommandCompletion("@players")
     public static void unbanAllWarpOwners(CommandSender sender) {
-        PluginData.BANNED_WARP_OWNERS.get().clear();
+        WarpsX.getPluginData().getBannedWarpOwners().clear();
         Chat.admin(sender, "&aSuccessfully unbanned all players banned from creating warps");
     }
 
@@ -245,8 +247,8 @@ public class AdminWarpsCommand extends BaseCommand {
     @CommandCompletion("@booleans")
     public static void setAdminOnly(CommandSender sender, @Values("toggle|true|false") @Default("toggle") String value) {
         if (value.equals("toggle")) {
-            PluginData.ADMIN_ONLY.set(!PluginData.ADMIN_ONLY.get());
-            if (PluginData.ADMIN_ONLY.get()) {
+            WarpsX.getPluginData().setAdminOnly(!WarpsX.getPluginData().isAdminOnly());
+            if (WarpsX.getPluginData().isAdminOnly()) {
                 Chat.admin(sender, "&aWarps are now &dadmin-only&a.");
                 return;
             }
@@ -254,12 +256,43 @@ public class AdminWarpsCommand extends BaseCommand {
             return;
         }
         boolean v = Boolean.parseBoolean(value);
-        PluginData.ADMIN_ONLY.set(v);
+        WarpsX.getPluginData().setAdminOnly(v);
         if (v) {
             Chat.admin(sender, "&aWarps are now &dadmin-only&a.");
             return;
         }
         Chat.admin(sender, "&aWarps are no longer &dadmin-only&a.");
+    }
+
+    @Subcommand("command|addcmd|addcommand")
+    @CommandPermission("%admin.command.add")
+    @Syntax("&e<warp key> <command to add>")
+    @CommandCompletion("@playerwarps")
+    @Description("Add command to be ran by console when the player uses the warp")
+    public static void addCommand(CommandSender sender, PlayerWarp warp, String command) {
+        warp.getCommands().add(command);
+        Chat.admin(sender, "&aCommand &e" + command + " &ahas been successfully added.");
+    }
+
+    @Subcommand("removecmd|removecommand")
+    @CommandPermission("%admin.command.remove")
+    @Syntax("&e<warp key> <command to remove>")
+    @CommandCompletion("@playerwarps")
+    @Description("Remove a warp command (See addcommand)")
+    public static void removeCommand(CommandSender sender, PlayerWarp warp, String command) {
+        warp.getCommands().remove(command);
+        Chat.admin(sender, "&aCommand &e" + command + " &ahas been successfully added.");
+    }
+
+    @Subcommand("listcommands|listcmds")
+    @CommandPermission("%admin.command.list")
+    @Syntax("&e<warp key>")
+    @CommandCompletion("@playerwarps")
+    @Description("List all commands of a specific warp")
+    public static void listCommands(CommandSender sender, PlayerWarp warp) {
+        Set<String> commands = warp.getCommands();
+        Chat.unprefixed(sender, "&3Commands: " + (commands.isEmpty() ? "&cNone" : ""));
+        commands.stream().map(c -> c.replace("{player}", "&d{player}&e")).forEach(cmd -> Chat.unprefixed(sender, "&7- &e" + cmd));
     }
 
     @Subcommand("warpslimit|limit|createlimit")
@@ -268,8 +301,28 @@ public class AdminWarpsCommand extends BaseCommand {
     @Description("Set the amount of warps a player is allowed to have")
     @CommandCompletion("@range:1-10")
     public static void setWarpLimit(CommandSender sender, int limit) {
-        PluginData.WARPS_LIMIT.set(limit);
+        WarpsX.getPluginData().setWarpsLimit(limit);
         Chat.admin(sender, "&aWarps limit has been set to &e" + limit + "&a.");
+    }
+
+    @Subcommand("createcost|warpcreationcost")
+    @CommandPermission("%admin.setwarpcreationcost")
+    @Syntax("&e<new cost>")
+    @Description("Set the cost of creating warps")
+    @CommandCompletion("@range:1-10")
+    public static void setWarpCreationCost(CommandSender sender, int cost) {
+        WarpsX.getPluginData().setWarpCreationCost(cost);
+        Chat.admin(sender, "&aCreating a warp now charges players &e" + cost + "$&a.");
+    }
+
+    @Subcommand("cost|warpcost|usecost")
+    @CommandPermission("%admin.warpcost")
+    @Syntax("&e<warp key> <new cost>")
+    @Description("Set the cost of using a specific warp")
+    @CommandCompletion("@playerwarps @range:1-10")
+    public static void setWarpCost(CommandSender sender, PlayerWarp warp, int cost) {
+        warp.setUseCost(cost);
+        Chat.admin(sender, "&aCreating a warp now charges players &e" + cost + "$&a.");
     }
 
     private static PotionEffect parseEffect(String text) {

@@ -15,9 +15,8 @@
  */
 package io.github.reflxction.warps.json;
 
-import io.github.moltenjson.configuration.select.SelectKey;
-import io.github.moltenjson.configuration.select.SelectionHolder;
-import org.bukkit.OfflinePlayer;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,16 +27,52 @@ import java.util.UUID;
  */
 public class PluginData {
 
-    @SelectKey("adminOnly")
-    public static final SelectionHolder<Boolean> ADMIN_ONLY = new SelectionHolder<>(true);
+    @Expose
+    private boolean adminOnly = false;
 
-    @SelectKey("warpsLimit")
-    public static final SelectionHolder<Integer> WARPS_LIMIT = new SelectionHolder<>(15);
+    @Expose
+    private int warpsLimit = 15;
 
-    @SelectKey("bannedPlayers")
-    public static final SelectionHolder<Set<UUID>> BANNED_USERS = new SelectionHolder<>(new HashSet<>());
+    @Expose
+    @SerializedName("bannedPlayers")
+    private Set<UUID> bannedUsers = new HashSet<>();
 
-    @SelectKey("bannedWarpOwners")
-    public static final SelectionHolder<Set<UUID>> BANNED_WARP_OWNERS = new SelectionHolder<>(new HashSet<>());
+    @Expose
+    private int warpCreationCost = 0;
+
+    @Expose
+    private Set<UUID> bannedWarpOwners = new HashSet<>();
+
+    public boolean isAdminOnly() {
+        return adminOnly;
+    }
+
+    public int getWarpsLimit() {
+        return warpsLimit;
+    }
+
+    public Set<UUID> getBannedUsers() {
+        return bannedUsers;
+    }
+
+    public Set<UUID> getBannedWarpOwners() {
+        return bannedWarpOwners;
+    }
+
+    public int getWarpCreationCost() {
+        return warpCreationCost;
+    }
+
+    public void setAdminOnly(boolean adminOnly) {
+        this.adminOnly = adminOnly;
+    }
+
+    public void setWarpsLimit(int warpsLimit) {
+        this.warpsLimit = warpsLimit;
+    }
+
+    public void setWarpCreationCost(int warpCreationCost) {
+        this.warpCreationCost = warpCreationCost;
+    }
 
 }

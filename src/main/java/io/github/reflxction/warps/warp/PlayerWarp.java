@@ -39,42 +39,92 @@ import java.util.Set;
  */
 public class PlayerWarp {
 
+    /**
+     * The warp key
+     */
     @Expose
     private String key;
 
+    /**
+     * The warp owner
+     */
     @Expose
     private OfflinePlayer owner;
 
+    /**
+     * The warp delay
+     */
     @Expose
     private int delay = PluginSettings.DEFAULT_DELAY.get();
 
+    /**
+     * The warp exclusion time left
+     */
     @Expose
     private int exclusion = -1;
 
+    /**
+     * Whether is the warp public or not
+     */
     @Expose
     private boolean isPublic;
 
+    /**
+     * The warp location
+     */
     @Expose
     private Location location;
 
+    /**
+     * The warp greeting message
+     */
     @Expose
     private String greetingMessage = PluginSettings.DEFAULT_GREETING_MESSAGE.get();
 
+    /**
+     * Invited players
+     */
     @Expose
     private List<OfflinePlayer> invited = new ArrayList<>();
 
+    /**
+     * Blocked players
+     */
     @Expose
     private List<OfflinePlayer> bannedPlayers = new ArrayList<>();
 
+    /**
+     * Effects added to the player when this warp is used
+     */
     @Expose
     @SerializedName("effects")
     private Set<PotionEffect> potionEffects = new HashSet<>();
 
+    /**
+     * Commands ran by console when a player uses this warp
+     */
+    @Expose
+    private Set<String> commands = new HashSet<>();
+
+    /**
+     * Sound played when the warp is used
+     */
     @Expose
     private Sound cue = Compatibility.getSound("ENTITY_ARROW_HIT_PLAYER", "ARROW_HIT");
 
+    /**
+     * The cost of using this warp
+     */
+    @Expose
+    private int useCost = 0;
+
+    /**
+     * Whether is the warp banned
+     */
     @Expose
     private boolean banned;
+
+    /* Constant accessors */
 
     public String getKey() {
         return key;
@@ -100,8 +150,16 @@ public class PlayerWarp {
         return greetingMessage;
     }
 
+    public int getUseCost() {
+        return useCost;
+    }
+
     public Location getLocation() {
         return location;
+    }
+
+    public Set<String> getCommands() {
+        return commands;
     }
 
     public Set<PotionEffect> getPotionEffects() {
@@ -112,12 +170,18 @@ public class PlayerWarp {
         return cue;
     }
 
-    public boolean isBanned(OfflinePlayer player) {
-        return bannedPlayers.contains(player);
-    }
-
     public List<OfflinePlayer> getBannedPlayers() {
         return bannedPlayers;
+    }
+
+    public List<OfflinePlayer> getInvited() {
+        return invited;
+    }
+
+    /* Banning methods */
+
+    public boolean isBanned(OfflinePlayer player) {
+        return bannedPlayers.contains(player);
     }
 
     public void banPlayer(OfflinePlayer player) {
@@ -132,12 +196,18 @@ public class PlayerWarp {
         return banned;
     }
 
+    /* Setters */
+
     public void setKey(String key) {
         this.key = key;
     }
 
     public void setDelay(int delay) {
         this.delay = delay;
+    }
+
+    public void setUseCost(int useCost) {
+        this.useCost = useCost;
     }
 
     public void setPublic(boolean aPublic) {
@@ -156,6 +226,15 @@ public class PlayerWarp {
         this.exclusion = exclusion;
     }
 
+    public void setSound(Sound sound) {
+        this.cue = sound;
+    }
+
+    public void setBanned(boolean banned) {
+        this.banned = banned;
+    }
+
+    /* Inviting methods */
     public void invite(OfflinePlayer player) {
         invited.add(player);
     }
@@ -171,22 +250,12 @@ public class PlayerWarp {
         return invited.contains(player);
     }
 
-    public void setSound(Sound sound) {
-        this.cue = sound;
-    }
-
-    public void setBanned(boolean banned) {
-        this.banned = banned;
-    }
+    /* Permission methods */
 
     public boolean canModify(CommandSender sender) {
         if (sender instanceof BlockCommandSender) return false;
         if (sender.hasPermission("warpsx.admin.modify")) return true;
         return owner.getUniqueId().equals(((Player) sender).getUniqueId());
-    }
-
-    public List<OfflinePlayer> getInvited() {
-        return invited;
     }
 
     public static class Creator implements InstanceCreator<PlayerWarp> {

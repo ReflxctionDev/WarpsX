@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 /**
  * Contains all plugin settings
  */
-@SuppressWarnings("unchecked") // Lots of casts for generics
+@SuppressWarnings({"unchecked", "rawtypes"}) // Lots of casts for generics
 public enum PluginSettings {
 
     STORING_STRATEGY("Storage.PlayerStoringStrategy", PlayerStoringStrategy.UUID),
@@ -19,7 +19,10 @@ public enum PluginSettings {
     DEFAULT_DELAY("Warps.DefaultDelay", 10),
     SAFETY_RADIUS("WarpSafety.SafetyCuboidLength", 5),
     SAFETY_WARN("WarpSafety.WarnBeforeWarping", true),
-    SAFETY_CHECKS("WarpSafety.Checks", Collections.emptyList());
+    SAFETY_CHECKS("WarpSafety.Checks", Collections.emptyList()),
+    SAFETY_INVINCIBILITY("WarpSafety.Invincibility.Enabled", true),
+    SAFETY_INVINCIBILITY_TIME("WarpSafety.Invincibility.Time", 5),
+    GRIEFPREVENTION_CHECK_CLAIM("GriefPrevention.CheckClaims", true);
 
     public static final PluginSettings[] values = values();
 
@@ -104,7 +107,8 @@ public enum PluginSettings {
      * @param <E> Enum type
      * @return The enumeration value
      */
-    @SuppressWarnings("RedundantCast") // it does not compile if I remove the cast, so tehcnically its not redundant but intellij is stupid
+    @SuppressWarnings("RedundantCast")
+    // it does not compile if I remove the cast, so tehcnically its not redundant but intellij is stupid
     public <E extends Enum> Set<E> requestEnumSet(Class<E> clazz) {
         List<String> values = WarpsX.getPlugin().getConfig().getStringList(path);
         return ((Stream<E>) values.stream().map(s -> (E) Enum.valueOf(clazz, s.toUpperCase()))).collect(Collectors.toSet());

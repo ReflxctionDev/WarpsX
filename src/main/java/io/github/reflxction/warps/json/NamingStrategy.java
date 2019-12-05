@@ -17,7 +17,7 @@ package io.github.reflxction.warps.json;
 
 import io.github.reflxction.warps.config.PlayerStoringStrategy;
 import io.github.reflxction.warps.config.PluginSettings;
-import io.github.moltenjson.configuration.tree.strategy.TreeNamingStrategy;
+import net.moltenjson.configuration.tree.strategy.TreeNamingStrategy;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 

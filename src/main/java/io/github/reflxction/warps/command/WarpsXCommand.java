@@ -37,6 +37,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,7 +76,7 @@ public class WarpsXCommand extends BaseCommand implements Listener {
     @Syntax("&e[element to reload]")
     @Description("Reload a specific element")
     @CommandCompletion("@reloadable")
-    public static void reload(CommandSender sender, @Optional @Default("config") @Values("config|warps-gui|messages") String target) {
+    public static void reload(CommandSender sender, @Optional @Default("config") @Values("config|warps-gui|messages") String target) throws IOException {
         switch (target) {
             case "messages":
                 MessageKey.load();
@@ -87,7 +88,7 @@ public class WarpsXCommand extends BaseCommand implements Listener {
                 Chat.admin(sender, "&aPlugin config has been reloaded");
                 break;
             case "warps-gui":
-                WarpsX.getPlugin().getWarpsGUI().refresh();
+                WarpsX.getPlugin().getConfigurationPack().updateField("warpGUI");
                 Chat.admin(sender, "&aWarps GUI has been reloaded");
                 break;
         }

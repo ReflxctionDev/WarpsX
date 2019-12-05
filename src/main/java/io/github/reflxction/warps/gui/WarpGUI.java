@@ -16,8 +16,6 @@
 package io.github.reflxction.warps.gui;
 
 import com.google.gson.annotations.Expose;
-import io.github.moltenjson.configuration.select.SelectKey;
-import io.github.moltenjson.configuration.select.SelectionHolder;
 import io.github.reflxction.warps.WarpsX;
 import io.github.reflxction.warps.command.ToWarpCommand;
 import io.github.reflxction.warps.command.WarpsCommand;
@@ -47,11 +45,11 @@ import java.util.stream.Collectors;
 
 public class WarpGUI implements Listener {
 
-    @SelectKey("allWarpsMenu")
-    private static final SelectionHolder<AllWarpsMenu> ALL_WARPS_MENU = new SelectionHolder<>(null);
+    @Expose
+    private AllWarpsMenu allWarpsMenu = null;
 
-    @SelectKey("warpsMenu")
-    private static final SelectionHolder<Menu> MENU = new SelectionHolder<>(null);
+    @Expose
+    private Menu warpsMenu = null;
 
     private static final Map<IntPredicate, Integer> SLOT_SIZE = new HashMap<>();
     private static final Entry<IntPredicate, Integer> INVALID_SIZE = new SimpleEntry<>(null, 6);
@@ -76,9 +74,9 @@ public class WarpGUI implements Listener {
         }
         if (player.hasMetadata("warpsx.warpgui")) {
             event.setCancelled(true);
-            GuiItem warpTo = MENU.get().getItems().get("goToWarp");
-            GuiItem deleteWarp = MENU.get().getItems().get("deleteWarp");
-            GuiItem changeLoc = MENU.get().getItems().get("changeLocation");
+            GuiItem warpTo = warpsMenu.getItems().get("goToWarp");
+            GuiItem deleteWarp = warpsMenu.getItems().get("deleteWarp");
+            GuiItem changeLoc = warpsMenu.getItems().get("changeLocation");
             PlayerWarp warp = (PlayerWarp) player.getMetadata("warpsx.warpgui").get(0).value();
             if (event.getSlot() == warpTo.getSlot()) removeThen(player, (c) -> ToWarpCommand.warpTo(c, warp, false));
             if (event.getSlot() == deleteWarp.getSlot()) removeThen(player, (c) -> WarpsCommand.deleteWarp(c, warp));
@@ -100,12 +98,12 @@ public class WarpGUI implements Listener {
 
     public static void displayAllWarps(Player player) {
         Map<String, PlayerWarp> warps = WarpController.getWarps(player);
-        Inventory inventory = Bukkit.createInventory(null, getAppropriateSize(warps.size()), ALL_WARPS_MENU.get().getTitle(player));
+        Inventory inventory = Bukkit.createInventory(null, getAppropriateSize(warps.size()), WarpsX.getWarpGUI().allWarpsMenu.getTitle(player));
         List<PlayerWarp> warpList = new ArrayList<>(warps.values());
         Map<Integer, PlayerWarp> warpsMap = new HashMap<>();
         for (int i = 0; i < warpList.size(); i++) {
             PlayerWarp warp = warpList.get(i);
-            ItemStack item = applyPlaceholders(ALL_WARPS_MENU.get().getWarpItem(), warp);
+            ItemStack item = applyPlaceholders(WarpsX.getWarpGUI().allWarpsMenu.getWarpItem(), warp);
             warpsMap.put(i, warp);
             inventory.setItem(i, item);
         }
@@ -114,7 +112,7 @@ public class WarpGUI implements Listener {
     }
 
     public static void displayWarp(Player player, PlayerWarp warp) {
-        Menu menu = MENU.get();
+        Menu menu = WarpsX.getWarpGUI().warpsMenu;
         Inventory i = Bukkit.createInventory(null, menu.getRows() * 9, placeholders(menu.getTitle(), warp));
         GuiItem warpTo = menu.getItems().get("goToWarp");
         GuiItem deleteWarp = menu.getItems().get("deleteWarp");

@@ -4,14 +4,12 @@ import co.aikar.commands.*;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.github.moltenjson.configuration.direct.DirectConfiguration;
-import io.github.moltenjson.configuration.select.SelectableConfiguration;
-import io.github.moltenjson.configuration.tree.TreeConfiguration;
-import io.github.moltenjson.configuration.tree.TreeConfigurationBuilder;
-import io.github.moltenjson.json.JsonFile;
 import io.github.reflxction.warps.command.*;
 import io.github.reflxction.warps.config.PluginSettings;
 import io.github.reflxction.warps.gui.WarpGUI;
+import io.github.reflxction.warps.hook.GPHook;
+import io.github.reflxction.warps.hook.HookRegistry;
+import io.github.reflxction.warps.hook.VaultHook;
 import io.github.reflxction.warps.json.NamingStrategy;
 import io.github.reflxction.warps.json.PlayerData;
 import io.github.reflxction.warps.json.PluginData;
@@ -19,14 +17,23 @@ import io.github.reflxction.warps.json.adapter.EnchantmentsAdapter;
 import io.github.reflxction.warps.json.adapter.LocationAdapter;
 import io.github.reflxction.warps.json.adapter.OfflinePlayerAdapter;
 import io.github.reflxction.warps.json.adapter.PotionEffectsAdapter;
+import io.github.reflxction.warps.listener.CommandListener;
 import io.github.reflxction.warps.listener.JoinListener;
 import io.github.reflxction.warps.messages.Chat;
 import io.github.reflxction.warps.messages.MessageKey;
+import io.github.reflxction.warps.safety.WarpInvincibility;
 import io.github.reflxction.warps.util.FileManager;
 import io.github.reflxction.warps.util.compatibility.Compatibility;
-import io.github.reflxction.warps.util.game.DelayManager;
+import io.github.reflxction.warps.util.game.delay.DelayExecutor;
+import io.github.reflxction.warps.util.game.delay.ExclusionManager;
 import io.github.reflxction.warps.warp.PlayerWarp;
 import io.github.reflxction.warps.warp.WarpController;
+import net.moltenjson.configuration.direct.DirectConfiguration;
+import net.moltenjson.configuration.pack.ConfigurationPack;
+import net.moltenjson.configuration.pack.DeriveFrom;
+import net.moltenjson.configuration.tree.TreeConfiguration;
+import net.moltenjson.configuration.tree.TreeConfigurationBuilder;
+import net.moltenjson.json.JsonFile;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -67,16 +74,20 @@ public final class WarpsX extends JavaPlugin {
      */
     private static WarpsX plugin;
 
+    private DelayExecutor delayExecutor = new DelayExecutor(this);
+
     /**
      * File manager
      */
     private FileManager<WarpsX> fileManager = new FileManager<>(this);
 
-    private SelectableConfiguration pluginData = SelectableConfiguration.of(JsonFile.of(fileManager.createFile("plugin-data.json")), false, GSON)
-            .register(PluginData.class);
+    private ConfigurationPack<WarpsX> configurationPack = new ConfigurationPack<>(this, getDataFolder(), GSON);
 
-    private SelectableConfiguration warpsGUI = SelectableConfiguration.of(JsonFile.of(fileManager.createFile("warps-gui.json")), false, GSON)
-            .register(WarpGUI.class);
+    @DeriveFrom("plugin-data.json")
+    private static PluginData pluginData = new PluginData();
+
+    @DeriveFrom("warps-gui.json")
+    private static WarpGUI warpGUI = new WarpGUI();
 
     /**
      * The data tree
@@ -105,11 +116,20 @@ public final class WarpsX extends JavaPlugin {
         PaperCommandManager commandManager = new PaperCommandManager(this);
         initCommandManager(commandManager);
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
+        getServer().getPluginManager().registerEvents(new CommandListener(), this);
         getServer().getPluginManager().registerEvents(new WarpGUI(), this);
+        getServer().getPluginManager().registerEvents(new WarpInvincibility(this), this);
         getServer().getPluginManager().registerEvents(WarpsXCommand.INSTANCE, this);
-        DelayManager.start(this);
-        pluginData.associate();
-        warpsGUI.associate();
+        ExclusionManager.start(this);
+        delayExecutor.start();
+        try {
+            configurationPack.register();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        HookRegistry.registerAllHooks();
+        if (HookRegistry.isHookEnabled(VaultHook.class))
+            getServer().getPluginManager().registerEvents(new VaultHook(), this);
     }
 
     public TreeConfiguration<OfflinePlayer, PlayerData> getWarpsTree() {
@@ -126,14 +146,14 @@ public final class WarpsX extends JavaPlugin {
     @Override
     public void onDisable() {
         MessageKey.save();
-        warpKeys.save(Throwable::printStackTrace, GSON);
+        warpKeys.save(GSON, Throwable::printStackTrace);
         try {
             warpsTree.lazySave();
+            configurationPack.saveField("pluginData");
         } catch (IOException e) {
             getLogger().severe("Unable to save data");
             e.printStackTrace();
         }
-        pluginData.save();
     }
 
     /**
@@ -181,6 +201,12 @@ public final class WarpsX extends JavaPlugin {
             if (!c.getIssuer().isPlayer())
                 throw new ConditionFailedException(Chat.colorize("&cYou must be a player to use this command!"));
         });
+        commandManager.getCommandConditions().addCondition("claim", (c) -> {
+            if (!((boolean) PluginSettings.GRIEFPREVENTION_CHECK_CLAIM.get())) return;
+            Player player = c.getIssuer().getPlayer();
+            if (HookRegistry.isHookEnabled(GPHook.class) && !GPHook.isOwnerAtLocation(player, player.getLocation()))
+                throw new ConditionFailedException(Chat.colorize("&cYou cannot set warps in the claims of other players!"));
+        });
         commandManager.getCommandReplacements().addReplacement("admin", "warpsx.admin");
         commandManager.getCommandCompletions().registerStaticCompletion("booleans", Arrays.asList("true", "false", "toggle"));
         commandManager.getCommandCompletions().registerStaticCompletion("confirmation", Collections.singletonList("confirm"));
@@ -197,12 +223,16 @@ public final class WarpsX extends JavaPlugin {
         //</editor-fold>
     }
 
-    {
-        fileManager.createFile("messages.json");
+    public static WarpGUI getWarpGUI() {
+        return warpGUI;
     }
 
-    public SelectableConfiguration getWarpsGUI() {
-        return warpsGUI;
+    public static PluginData getPluginData() {
+        return pluginData;
+    }
+
+    public DelayExecutor getDelayExecutor() {
+        return delayExecutor;
     }
 
     private static boolean getBoolean(BukkitCommandExecutionContext c) {
@@ -220,5 +250,15 @@ public final class WarpsX extends JavaPlugin {
             default:
                 return false;
         }
+    }
+
+    {
+        fileManager.createFile("messages.json");
+        fileManager.createFile("plugin-data.json");
+        fileManager.createFile("warps-gui.json");
+    }
+
+    public ConfigurationPack<WarpsX> getConfigurationPack() {
+        return configurationPack;
     }
 }

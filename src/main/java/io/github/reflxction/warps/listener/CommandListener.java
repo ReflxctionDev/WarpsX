@@ -15,28 +15,16 @@
  */
 package io.github.reflxction.warps.listener;
 
-import io.github.reflxction.warps.WarpsX;
-import io.github.reflxction.warps.json.PlayerData;
+import io.github.reflxction.warps.api.WarpUseEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.io.IOException;
-
-public class JoinListener implements Listener {
-
-    private WarpsX plugin;
-
-    public JoinListener(WarpsX plugin) {
-        this.plugin = plugin;
-    }
+public class CommandListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerJoin(PlayerJoinEvent event) throws IOException {
-        if (plugin.getWarpsTree().lazyLoad(event.getPlayer(), PlayerData.class) == null)
-            plugin.getWarpsTree().create(event.getPlayer(), new PlayerData(), "json");
+    public void onWarpUse(WarpUseEvent event) {
+        event.getWarp().getCommands().stream().map(c -> c.replace("{player}", event.getPlayer().getName()))
+                .forEach(c -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), c));
     }
-
-
-
 }

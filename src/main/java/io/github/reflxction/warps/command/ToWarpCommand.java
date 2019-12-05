@@ -17,14 +17,17 @@ package io.github.reflxction.warps.command;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
+import io.github.reflxction.warps.WarpsX;
+import io.github.reflxction.warps.api.WarpUseEvent;
 import io.github.reflxction.warps.config.PluginSettings;
 import io.github.reflxction.warps.json.PluginData;
 import io.github.reflxction.warps.messages.Chat;
 import io.github.reflxction.warps.messages.MessageKey;
 import io.github.reflxction.warps.safety.SafetyViolations;
 import io.github.reflxction.warps.util.compatibility.Commands;
-import io.github.reflxction.warps.util.game.DelayManager;
+import io.github.reflxction.warps.util.game.delay.DelayData;
 import io.github.reflxction.warps.warp.PlayerWarp;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
@@ -46,7 +49,7 @@ public class ToWarpCommand extends BaseCommand {
             return;
         }
         Player player = Commands.safe(sender);
-        if (PluginData.BANNED_USERS.get().contains(player.getUniqueId())) {
+        if (WarpsX.getPluginData().getBannedUsers().contains(player.getUniqueId())) {
             MessageKey.USER_BANNED.send(sender, warp.getLocation(), warp, player);
             return;
         }
@@ -71,23 +74,24 @@ public class ToWarpCommand extends BaseCommand {
             return;
         }
         if (warp.getDelay() != 0) {
-            int delay = DelayManager.getDelay(player, warp);
+            int delay = WarpsX.getPlugin().getDelayExecutor().getTimeLeft(player, "warp=" + warp);
             if (delay != 0) {
                 if (delay <= 60) {
                     MessageKey.MUST_WAIT.send(sender, warp.getLocation(), warp, player);
                     return;
-                } else {
-                    int hours = delay / 3600;
-                    int minutes = (delay % 3600) / 60;
-                    int seconds = delay % 60;
-                    String m = (hours == 0 ? "" : hours + " hour" + plural(hours) + " ") + (minutes == 0 ? "" : minutes + " minute" + plural(minutes) + " ") + (seconds == 0 ? "" : seconds);
-                    MessageKey.MUST_WAIT.send(sender, warp.getLocation(), warp, player, "{player_delay}", m, "{player_delay_plural}", plural(seconds));
-                    return;
                 }
+                int hours = delay / 3600;
+                int minutes = (delay % 3600) / 60;
+                int seconds = delay % 60;
+                String m = (hours == 0 ? "" : hours + " hour" + plural(hours) + " ") + (minutes == 0 ? "" : minutes + " minute" + plural(minutes) + " ") + (seconds == 0 ? "" : seconds);
+                MessageKey.MUST_WAIT.send(sender, warp.getLocation(), warp, player, "{player_delay}", m, "{player_delay_plural}", plural(seconds));
+                return;
             }
-            DelayManager.delayPlayer(player, warp);
+            WarpsX.getPlugin().getDelayExecutor().setDelay(player, "warp=" + warp.getKey(), new DelayData(warp.getDelay()));
         }
         player.teleport(warp.getLocation());
+        WarpUseEvent warpUseEvent = new WarpUseEvent(player, warp);
+        Bukkit.getPluginManager().callEvent(warpUseEvent);
         if (warp.getSound() != null)
             player.playSound(player.getLocation(), warp.getSound(), 1, 1);
         if (warp.getPotionEffects() != null) warp.getPotionEffects().forEach(player::addPotionEffect);
@@ -98,4 +102,5 @@ public class ToWarpCommand extends BaseCommand {
     private static String plural(int v) {
         return v <= 1 ? "" : "s";
     }
+
 }

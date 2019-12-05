@@ -18,11 +18,10 @@ package io.github.reflxction.warps.messages;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import io.github.moltenjson.configuration.direct.DirectConfiguration;
-import io.github.moltenjson.json.JsonFile;
 import io.github.reflxction.warps.WarpsX;
-import io.github.reflxction.warps.util.game.DelayManager;
 import io.github.reflxction.warps.warp.PlayerWarp;
+import net.moltenjson.configuration.direct.DirectConfiguration;
+import net.moltenjson.json.JsonFile;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -162,7 +161,7 @@ public enum MessageKey {
         if (player != null) {
             message = message.replace("{player}", player.getName());
             if (warp != null && player.isOnline()) {
-                int delay = DelayManager.getDelay(player.getPlayer(), warp);
+                int delay = WarpsX.getPlugin().getDelayExecutor().getTimeLeft(player.getPlayer(), "warp=" + warp);
                 message = message
                         .replace("{player_delay_plural}", delay == 1 ? "" : "s")
                         .replace("{player_delay}", Integer.toString(delay));
@@ -221,7 +220,7 @@ public enum MessageKey {
      */
     public static void save() {
         MESSAGES_MAP.forEach((category, messages) -> MESSAGES_CONFIG.set(category.name().toLowerCase(), messages, GSON));
-        MESSAGES_CONFIG.save(Throwable::printStackTrace, GSON);
+        MESSAGES_CONFIG.save(GSON, Throwable::printStackTrace);
     }
 
     /**

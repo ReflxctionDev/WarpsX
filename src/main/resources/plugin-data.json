@@ -1,1 +1,6 @@
-{}
+{
+  "adminOnly": false,
+  "warpsLimit": 15,
+  "bannedPlayers": [],
+  "bannedWarpOwners": []
+}

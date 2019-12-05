@@ -16,9 +16,12 @@
 package io.github.reflxction.warps.warp;
 
 import io.github.reflxction.warps.WarpsX;
+import io.github.reflxction.warps.api.WarpCreateEvent;
+import io.github.reflxction.warps.api.WarpDeletedEvent;
 import io.github.reflxction.warps.config.PlayerStoringStrategy;
 import io.github.reflxction.warps.config.PluginSettings;
 import io.github.reflxction.warps.json.PlayerData;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 import java.util.Map;
@@ -32,13 +35,17 @@ public class WarpController {
         OfflinePlayer owner = warp.getOwner();
         WarpsX.getPlugin().getWarpsTree().lazyLoad(owner, PlayerData.class).getWarps().put(warp.getKey(), warp);
         WarpsX.getPlugin().getWarpKeys().set(warp.getKey(), ((PlayerStoringStrategy) PluginSettings.STORING_STRATEGY.get()).to(owner));
+        WarpCreateEvent event = new WarpCreateEvent(warp.getOwner().getPlayer(), warp);
+        Bukkit.getPluginManager().callEvent(event);
     }
 
     public static void removeWarp(String key) {
         String owner = WarpsX.getPlugin().getWarpKeys().getString(key);
         OfflinePlayer player = ((PlayerStoringStrategy) PluginSettings.STORING_STRATEGY.get()).from(owner);
-        WarpsX.getPlugin().getWarpsTree().lazyLoad(player, PlayerData.class).getWarps().remove(key);
+        PlayerWarp warp = WarpsX.getPlugin().getWarpsTree().lazyLoad(player, PlayerData.class).getWarps().remove(key);
         WarpsX.getPlugin().getWarpKeys().remove(key);
+        if (warp != null)
+            Bukkit.getPluginManager().callEvent(new WarpDeletedEvent(warp));
     }
 
     public static PlayerWarp getWarp(String key) {

@@ -55,3 +55,19 @@ WarpSafety:
     - SUFFOCATION
     - NO_BLOCKS
     - NO_PLATFORM
+
+  # Warp invincibility settings
+  #
+  # These settings control the invincibility a player is given when they use the warp
+  Invincibility:
+    Enabled: true
+    Time: 10
+
+# GriefPrevention hooks settings
+GriefPrevention:
+
+  # Whether should the plugin prevent players from creating warps in the claims
+  # of other people.
+  #
+  # Default value: true
+  CheckClaims: true

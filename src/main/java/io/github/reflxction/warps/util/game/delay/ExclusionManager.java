@@ -13,48 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.reflxction.warps.util.game;
+package io.github.reflxction.warps.util.game.delay;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import io.github.reflxction.warps.WarpsX;
 import io.github.reflxction.warps.messages.Chat;
 import io.github.reflxction.warps.warp.PlayerWarp;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.UUID;
 
-public class DelayManager {
-
-    private static final Multimap<UUID, WarpDelay> DELAY_MAP = ArrayListMultimap.create();
+/**
+ * A utility for managing exclusions
+ */
+public class ExclusionManager {
 
     private static final Map<PlayerWarp, Integer> OPEN = new HashMap<>();
-
-    public static void delayPlayer(Player player, PlayerWarp warp) {
-        DELAY_MAP.put(player.getUniqueId(), new WarpDelay(warp));
-    }
 
     public static void startExclusion(PlayerWarp warp) {
         OPEN.put(warp, warp.getExclusion());
         warp.setPublic(true);
     }
 
-    public static int getDelay(Player player, PlayerWarp warp) {
-        if (player.hasPermission("warpsx.admin.bypass.delay")) return 0;
-        WarpDelay delay = DELAY_MAP.get(player.getUniqueId()).stream().filter(d -> d.warp.getKey().equals(warp.getKey())).findFirst()
-                .orElse(null);
-        if (delay == null) return 0;
-        return delay.getTimeLeft();
-    }
-
     private static void reduceAll() {
-        DELAY_MAP.values().removeIf(delay -> delay.reduceTime() <= 0);
-
         for (Iterator<Entry<PlayerWarp, Integer>> iterator = OPEN.entrySet().iterator(); iterator.hasNext(); ) {
             Entry<PlayerWarp, Integer> entry = iterator.next();
             PlayerWarp warp = entry.getKey();
@@ -71,31 +54,7 @@ public class DelayManager {
     }
 
     public static void start(WarpsX plugin) {
-        Bukkit.getScheduler().runTaskTimer(plugin, DelayManager::reduceAll, 20, 20);
-    }
-
-    private static class WarpDelay {
-
-        private PlayerWarp warp;
-        private int timeLeft;
-
-        WarpDelay(PlayerWarp warp) {
-            this.warp = warp;
-            this.timeLeft = warp.getDelay();
-        }
-
-        public PlayerWarp getWarp() {
-            return warp;
-        }
-
-        int getTimeLeft() {
-            return timeLeft;
-        }
-
-        int reduceTime() {
-            return timeLeft--;
-        }
-
+        Bukkit.getScheduler().runTaskTimer(plugin, ExclusionManager::reduceAll, 20, 20);
     }
 
 }

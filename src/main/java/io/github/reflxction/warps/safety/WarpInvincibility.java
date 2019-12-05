@@ -13,30 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.reflxction.warps.listener;
+package io.github.reflxction.warps.safety;
 
 import io.github.reflxction.warps.WarpsX;
-import io.github.reflxction.warps.json.PlayerData;
+import io.github.reflxction.warps.api.WarpUseEvent;
+import io.github.reflxction.warps.config.PluginSettings;
+import io.github.reflxction.warps.util.game.delay.DelayData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.io.IOException;
-
-public class JoinListener implements Listener {
+public class WarpInvincibility implements Listener {
 
     private WarpsX plugin;
 
-    public JoinListener(WarpsX plugin) {
+    public WarpInvincibility(WarpsX plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerJoin(PlayerJoinEvent event) throws IOException {
-        if (plugin.getWarpsTree().lazyLoad(event.getPlayer(), PlayerData.class) == null)
-            plugin.getWarpsTree().create(event.getPlayer(), new PlayerData(), "json");
+    public void onWarpUse(WarpUseEvent event) {
+        if (!((boolean) PluginSettings.SAFETY_INVINCIBILITY.get())) return;
+        int time = PluginSettings.SAFETY_INVINCIBILITY_TIME.get();
+        if (time > 0) {
+            event.getPlayer().setInvulnerable(true);
+            plugin.getDelayExecutor().setDelay(event.getPlayer(), "warp-safety", new DelayData(time).setOnFinish(player -> {
+                if (player.isOnline()) player.getPlayer().setInvulnerable(false);
+            }));
+        }
     }
-
-
 
 }
