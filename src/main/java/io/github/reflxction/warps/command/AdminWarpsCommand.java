@@ -267,7 +267,7 @@ public class AdminWarpsCommand extends BaseCommand {
     @Subcommand("command|addcmd|addcommand")
     @CommandPermission("%admin.command.add")
     @Syntax("&e<warp key> <command to add>")
-    @CommandCompletion("@playerwarps")
+    @CommandCompletion("@playerwarps @nothing")
     @Description("Add command to be ran by console when the player uses the warp")
     public static void addCommand(CommandSender sender, PlayerWarp warp, String command) {
         warp.getCommands().add(command);
@@ -277,7 +277,7 @@ public class AdminWarpsCommand extends BaseCommand {
     @Subcommand("removecmd|removecommand")
     @CommandPermission("%admin.command.remove")
     @Syntax("&e<warp key> <command to remove>")
-    @CommandCompletion("@playerwarps")
+    @CommandCompletion("@playerwarps @nothing")
     @Description("Remove a warp command (See addcommand)")
     public static void removeCommand(CommandSender sender, PlayerWarp warp, String command) {
         warp.getCommands().remove(command);
