@@ -6,7 +6,7 @@
 
     <groupId>io.github.reflxction</groupId>
     <artifactId>WarpsX</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>WarpsX</name>
@@ -42,8 +42,8 @@
                             <shadedPattern>io.github.reflxction.warps.dependencies.acf</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>net.moltenjson</pattern>
-                            <shadedPattern>io.github.reflxction.warps.dependencies.json</shadedPattern>
+                            <pattern>org.reflections</pattern>
+                            <shadedPattern>io.github.reflxction.warps.dependencies.reflections</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -86,11 +86,50 @@
 
     <dependencies>
 
+        <!-- org.reflections -->
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.10</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Grief Prevention -->
+        <dependency>
+            <groupId>me.ryanhamshire</groupId>
+            <artifactId>GriefPrevention</artifactId>
+            <version>16.12.0-d4d7ac4</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Vault API -->
+        <dependency>
+            <groupId>com.github.MilkBowl</groupId>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.7</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bukkit</groupId>
+                    <artifactId>bukkit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- JetBrains annotations -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>16.0.1</version>
             <scope>compile</scope>
+        </dependency>
+
+        <!-- SLF4J logger for org.reflections -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.0-alpha0</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -112,7 +151,15 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
-            <version>1.14.4-R0.1-SNAPSHOT</version>
+            <version>1.14.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- BukkitJSON -->
+        <dependency>
+            <groupId>com.github.moltenjson</groupId>
+            <artifactId>BukkitJSON</artifactId>
+            <version>2.5.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
