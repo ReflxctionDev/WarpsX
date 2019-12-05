@@ -7,7 +7,7 @@ import com.google.gson.GsonBuilder;
 import io.github.reflxction.warps.command.*;
 import io.github.reflxction.warps.config.PluginSettings;
 import io.github.reflxction.warps.gui.WarpGUI;
-import io.github.reflxction.warps.hook.GPHook;
+import io.github.reflxction.warps.hook.GriefPreventionHook;
 import io.github.reflxction.warps.hook.HookRegistry;
 import io.github.reflxction.warps.hook.VaultHook;
 import io.github.reflxction.warps.json.NamingStrategy;
@@ -127,7 +127,7 @@ public final class WarpsX extends JavaPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        HookRegistry.registerAllHooks();
+        HookRegistry.registerHooks(VaultHook.class, GriefPreventionHook.class);
         if (HookRegistry.isHookEnabled(VaultHook.class))
             getServer().getPluginManager().registerEvents(new VaultHook(), this);
     }
@@ -204,7 +204,7 @@ public final class WarpsX extends JavaPlugin {
         commandManager.getCommandConditions().addCondition("claim", (c) -> {
             if (!((boolean) PluginSettings.GRIEFPREVENTION_CHECK_CLAIM.get())) return;
             Player player = c.getIssuer().getPlayer();
-            if (HookRegistry.isHookEnabled(GPHook.class) && !GPHook.isOwnerAtLocation(player, player.getLocation()))
+            if (HookRegistry.isHookEnabled(GriefPreventionHook.class) && !GriefPreventionHook.isOwnerAtLocation(player, player.getLocation()))
                 throw new ConditionFailedException(Chat.colorize("&cYou cannot set warps in the claims of other players!"));
         });
         commandManager.getCommandReplacements().addReplacement("admin", "warpsx.admin");

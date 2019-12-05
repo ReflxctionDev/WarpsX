@@ -25,7 +25,7 @@ import org.bukkit.entity.Player;
  * Hook for GriefPrevention
  */
 @PluginHook(requiredPlugin = "GriefPrevention")
-public class GPHook {
+public class GriefPreventionHook {
 
     private static Claim getClaimAtLocation(final Location loc) {
         return GriefPrevention.instance.dataStore.getClaimAt(loc, false, null);

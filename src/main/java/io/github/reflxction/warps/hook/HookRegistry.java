@@ -3,7 +3,6 @@ package io.github.reflxction.warps.hook;
 import io.github.reflxction.warps.WarpsX;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-import org.reflections.Reflections;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,10 +32,10 @@ public class HookRegistry {
     /**
      * Registers all plugin hooks in this package
      */
-    public static void registerAllHooks() {
-        Reflections.log = null; // We don't want these log messages. (Absolutely safe, and the JAR is relocated anyway so it will not affect other plugins.)
-        Reflections reflections = new Reflections(PACKAGE);
-        for (Class<?> hookClass : reflections.getTypesAnnotatedWith(PluginHook.class)) {
+    public static void registerHooks(Class<?>... classes) {
+        for (Class<?> hookClass : classes) {
+            if (!hookClass.isAnnotationPresent(PluginHook.class)) continue;
+            ;
             PluginHook hook = hookClass.getAnnotation(PluginHook.class);
             Plugin plugin = Bukkit.getPluginManager().getPlugin(hook.requiredPlugin());
             if (plugin == null) {

@@ -86,14 +86,6 @@
 
     <dependencies>
 
-        <!-- org.reflections -->
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <version>0.9.10</version>
-            <scope>compile</scope>
-        </dependency>
-
         <!-- Grief Prevention -->
         <dependency>
             <groupId>me.ryanhamshire</groupId>
