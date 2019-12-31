@@ -79,7 +79,8 @@ public class WarpGUI implements Listener {
             GuiItem deleteWarp = warpsMenu.getItems().get("deleteWarp");
             GuiItem changeLoc = warpsMenu.getItems().get("changeLocation");
             PlayerWarp warp = (PlayerWarp) player.getMetadata("warpsx.warpgui").get(0).value();
-            if (event.getSlot() == warpTo.getSlot()) removeThen(player, (c) -> ToWarpCommand.warpTo(c, warp, false));
+            if (event.getSlot() == warpTo.getSlot())
+                removeThen(player, (c) -> ToWarpCommand.warpTo(c, warp, false, false));
             if (event.getSlot() == deleteWarp.getSlot()) removeThen(player, (c) -> WarpsCommand.deleteWarp(c, warp));
             if (event.getSlot() == changeLoc.getSlot()) removeThen(player, (c) -> WarpsCommand.changeLocation(c, warp));
         }

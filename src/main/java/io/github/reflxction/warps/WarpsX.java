@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.reflxction.warps.command.*;
 import io.github.reflxction.warps.config.PluginSettings;
+import io.github.reflxction.warps.converter.MessageFileConverter;
 import io.github.reflxction.warps.gui.WarpGUI;
 import io.github.reflxction.warps.hook.GriefPreventionHook;
 import io.github.reflxction.warps.hook.HookRegistry;
@@ -42,6 +43,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -209,6 +211,7 @@ public final class WarpsX extends JavaPlugin {
         });
         commandManager.getCommandReplacements().addReplacement("admin", "warpsx.admin");
         commandManager.getCommandCompletions().registerStaticCompletion("booleans", Arrays.asList("true", "false", "toggle"));
+        commandManager.getCommandCompletions().registerStaticCompletion("booleans2", Arrays.asList("true", "false"));
         commandManager.getCommandCompletions().registerStaticCompletion("confirmation", Collections.singletonList("confirm"));
         commandManager.getCommandCompletions().registerStaticCompletion("reloadable", Arrays.asList("config", "messages", "warps-gui"));
         commandManager.getCommandCompletions().registerCompletion("playerwarps", (c) -> warpsTree.lazyLoad(c.getPlayer(), PlayerData.class).getWarps().keySet());
@@ -253,6 +256,7 @@ public final class WarpsX extends JavaPlugin {
     }
 
     {
+        new MessageFileConverter(new File(getDataFolder(), "messages.json")).run();
         fileManager.createFile("messages.json");
         fileManager.createFile("plugin-data.json");
         fileManager.createFile("warps-gui.json");

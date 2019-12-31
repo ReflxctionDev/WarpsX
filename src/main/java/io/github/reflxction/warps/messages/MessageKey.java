@@ -55,6 +55,8 @@ public enum MessageKey {
     PLAYER_BANNED("playerBanned", MessageCategory.SUCCESS, "Player banned", "Sent when a player bans another player from using their warp"),
     PLAYER_UNBANNED("playerUnbanned", MessageCategory.SUCCESS, "Player unbanned", "Sent when a player unbans another player from using their warp"),
     UNBANNED_ALL("unbannedAll", MessageCategory.SUCCESS, "Unbanned all", "Sent when a player unbans all players from their warp"),
+    WARMING_UP("warmingUp", MessageCategory.SUCCESS, "Warming up", "Sent when a player has to warm up before using a warp"),
+    WARM_UP_CANCELLED("warmUpCancelled", MessageCategory.SUCCESS, "Warm up cancelled", "Sent when a player cancels warping in warm up because they moved"),
 
     /* Error messages */
     NO_PERMISSION("noPermission", MessageCategory.ERROR, "No permission", "Sent when a player attempts to use a command but has no permission"),

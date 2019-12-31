@@ -11,6 +11,30 @@ Warps:
   # Default value: 10
   DefaultDelay: 10
 
+  # The warm up settings
+  WarmUp:
+
+    # The time players get to wait for before using warps.
+    #
+    # This will give them a chance to prepare (in case it was a fighting area, for example), or cancel
+    # the teleportation (if it was accidental for example)
+    #
+    # Default value: 3
+    Time: 3
+
+    # Whether should the plugin ignore the Y level delta when checking locations to detect movement.
+    #
+    # This is recommended, as it will be difficult for players to use warps while swimming or free-falling.
+    #
+    # Default value: true
+    IgnoreYLevel: true
+
+    # Whether should players be allowed to instantly go to the warp and not have to wait for the
+    # warm up.
+    #
+    # Default value: true
+    AllowInstantUse: true
+
 # Storage settings
 Storage:
 
