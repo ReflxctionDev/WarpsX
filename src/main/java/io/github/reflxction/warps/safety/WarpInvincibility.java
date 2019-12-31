@@ -19,8 +19,10 @@ import io.github.reflxction.warps.WarpsX;
 import io.github.reflxction.warps.api.WarpUseEvent;
 import io.github.reflxction.warps.config.PluginSettings;
 import io.github.reflxction.warps.util.game.delay.DelayData;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public class WarpInvincibility implements Listener {
 
@@ -42,4 +44,10 @@ public class WarpInvincibility implements Listener {
         }
     }
 
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player)) return;
+        if (plugin.getDelayExecutor().hasDelay((Player) event.getDamager(), "warp-safety"))
+            event.setCancelled(true);
+    }
 }
