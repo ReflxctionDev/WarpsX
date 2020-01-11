@@ -20,6 +20,7 @@ import io.github.reflxction.warps.json.PlayerData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.io.IOException;
 
@@ -37,6 +38,8 @@ public class JoinListener implements Listener {
             plugin.getWarpsTree().create(event.getPlayer(), new PlayerData(), "json");
     }
 
-
-
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerQuit(PlayerQuitEvent event) throws IOException {
+        plugin.getWarpsTree().lazySave();
+    }
 }
